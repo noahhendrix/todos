@@ -5,7 +5,10 @@
 {{/view}}
 
 {{#view Todos.StatsView id="stats"}}
-  {{displayRemaining}} remaining
+  {{#view SC.Button classBinding="isActive" target="Todos.todoListController" action="clearCompletedTodos"}}
+    Clear Completed Todos
+  {{/view}}
+  {{displayRemaining}} remaining.
 {{/view}}
 
 {{#collection SC.TemplateCollectionView contentBinding="Todos.todoListController" itemClassBinding="content.isDone" }}
