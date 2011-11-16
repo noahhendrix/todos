@@ -12,16 +12,22 @@ Todos = SC.Application.create();
     isDone: false
   });
 
-Todos.CreateTodoView = SC.TextField.extend({
-  insertNewline: function() {
-    var value = this.get('value');
+// Views
+  Todos.CreateTodoView = SC.TextField.extend({
+    insertNewline: function() {
+      var value = this.get('value');
 
-    if (value) {
-      Todos.todoListController.createTodo(value);
-      this.set('value', '');
+      if (value) {
+        Todos.todoListController.createTodo(value);
+        this.set('value', '');
+      }
     }
-  }
-});
+  });
+  
+  Todos.MarkDoneView = SC.Checkbox.extend({
+    titleBinding: '.parentView.content.title',
+    valueBinding: '.parentView.content.isDone'
+  });
 
 SC.ready(function() {
   Todos.mainPane = SC.TemplatePane.append({
