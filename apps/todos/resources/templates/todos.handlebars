@@ -4,6 +4,10 @@
        placeholder="What needs to be done?" />
 {{/view}}
 
+{{#view Todos.StatsView id="stats"}}
+  {{displayRemaining}} remaining
+{{/view}}
+
 {{#collection SC.TemplateCollectionView contentBinding="Todos.todoListController" itemClassBinding="content.isDone" }}
 
   {{view Todos.MarkDoneView}}

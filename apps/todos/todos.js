@@ -28,6 +28,15 @@ Todos = SC.Application.create();
     titleBinding: '.parentView.content.title',
     valueBinding: '.parentView.content.isDone'
   });
+  
+  Todos.StatsView = SC.TemplateView.extend({
+    remainingBinding: 'Todos.todoListController.remaining',
+
+    displayRemaining: function() {
+      var remaining = this.get('remaining');
+      return remaining + (remaining === 1 ? " item" : " items");
+    }.property('remaining')
+  });
 
 SC.ready(function() {
   Todos.mainPane = SC.TemplatePane.append({
@@ -46,5 +55,9 @@ SC.ready(function() {
     createTodo: function(title) {
       var todo = Todos.Todo.create({ title: title });
       this.pushObject(todo);
-    }
+    },
+    
+    remaining: function() {
+      return this.filterProperty('isDone', false).get('length');
+    }.property('@each.isDone')
   });
