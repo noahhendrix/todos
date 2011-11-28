@@ -20,8 +20,8 @@ var Todos = SC.Application.create({
       var value = this.get('value');
 
       if (value) {
-        Todos.todoListController.createTodo(value);
         this.set('value', '');
+        return Todos.todoListController.createTodo(value);
       }
     }
   });
@@ -57,8 +57,14 @@ SC.ready(function() {
 
     // Creates a new todo with the passed title, then adds it
     // to the array.
-    createTodo: function(title) {
-      Todos.store.createRecord(Todos.Todo, { title: title });
+    createTodo: function(title, isDone) {
+      if (isDone == undefined)
+        var isDone = false;
+      
+      return Todos.store.createRecord(Todos.Todo, {
+        title: title,
+        isDone: isDone
+      });
     },
     
     remaining: function() {
@@ -74,7 +80,6 @@ SC.ready(function() {
     allAreDone: function(key, value) {
       if (value !== undefined) {
         this.setEach('isDone', value);
-        
         return value;
       } else {
         return this.get('length') && this.everyProperty('isDone', true);
