@@ -63,4 +63,35 @@ describe('todoListController', function() {
       expect(completed.get('isDone')).toBeFalsy();
     });
   });
+  
+  describe('filterByTag', function() {
+    var on_both, on_one;
+
+    beforeEach(function() {
+      on_both = Todos.store.createRecord(Todos.Tag, { title: 'on both' }, 200);
+      on_one = Todos.store.createRecord(Todos.Tag, { title: 'on one' }, 300);
+
+      completed.addTag(on_one);
+      completed.addTag(on_both);
+      uncompleted.addTag(on_both);
+    });
+
+    it('shows only todos tagged with filter', function() {
+      controller.filterByTag('on one');
+      expect(controller.content).toContain(completed);
+      expect(controller.content).not.toContain(uncompleted);
+    });
+
+    it('shows all todos if multiple are tagged with filter', function() {
+      controller.filterByTag('on both');
+      expect(controller.content).toContain(completed);
+      expect(controller.content).toContain(uncompleted);
+    });
+    
+    it('shows all if no query', function() {
+      controller.filterByTag('');
+      expect(controller.content).toContain(completed);
+      expect(controller.content).toContain(uncompleted);
+    });
+  });
 });
