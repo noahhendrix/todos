@@ -143,6 +143,7 @@ $border: 1px solid #bbb;
     margin: 10px 0 2px 0;
 
     & > li {
+      background: transparent static_url('edit.png') no-repeat scroll 99% 3px;
       padding: 5px;
       height: 14px;
       overflow: hidden;
