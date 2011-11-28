@@ -1,19 +1,42 @@
-<h1>Todos</h1>
+<h1>
+  Todos
+  
+  {{#view Todos.FilterView id="filter" classNames="search"}}
+    <input id="filter-query" type="search" placeholder="Filter by tag" />
+  {{/view}}
+</h1>
 {{#view Todos.CreateTodoView}}
-<input id="new-todo" type="text"
-       placeholder="What needs to be done?" />
+  <input id="new-todo" type="text" placeholder="What needs to be done?" />
 {{/view}}
 
 {{#view Todos.StatsView id="stats"}}
   {{#view SC.Button classBinding="isActive" target="Todos.todoListController" action="clearCompletedTodos"}}
     Clear Completed Todos
   {{/view}}
+  
   {{displayRemaining}} remaining.
 {{/view}}
 
 {{view SC.Checkbox class="mark-all-done" title="Mark All as Done"  valueBinding="Todos.todoListController.allAreDone"}}
 
-{{#collection SC.TemplateCollectionView contentBinding="Todos.todoListController" itemClassBinding="content.isDone" }}
-
+{{#collection Todos.TodosListView contentBinding="Todos.todoListController" itemClassBinding="content.isDone" classNames="todos"}}
   {{view Todos.MarkDoneView}}
+  
+  {{#each content.tags classNames="tags"}}
+    {{title}}
+  {{/each}}
+  
+  <div class="edit-tags">
+    {{#each content.tags}}
+      {{#view SC.Button target="Todos.todoListController" action="removeTag"}}
+        X
+      {{/view}}
+    
+      {{title}}
+    {{/each}}
+  
+    {{#view Todos.AddTagView}}
+      <input id="new-tag" type="text" placeholder="Add tag" />
+    {{/view}}
+  </div>
 {{/collection}}

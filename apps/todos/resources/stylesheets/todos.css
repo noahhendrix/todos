@@ -73,7 +73,7 @@ $border: 1px solid #bbb;
     .remaining {
       float: left;
     }
-
+    
     .sc-button {
       @include background-image(linear-gradient(#F9F9F9 1%, #DDD, #F2F2F2, #F7F7F7));
       border: 1px solid #828282;
@@ -89,6 +89,7 @@ $border: 1px solid #bbb;
         @include background-image(linear-gradient(#EFEFEF 1%, #D3D3D3, #E8E8E8, #EDEDED));
       }
     }
+    
   }
 
   input[type='text'] {
@@ -122,6 +123,14 @@ $border: 1px solid #bbb;
     left: 0;
     padding: ($padding / 2) $padding;
     border-bottom: $border;
+    
+    .search {
+      float: right;
+      
+      input[type="search"]{
+        width: 150px;
+      }
+    }
   }
 
   .sc-checkbox {
@@ -130,19 +139,57 @@ $border: 1px solid #bbb;
     }
   }
 
-  ul {
+  ul.todos {
     margin: 10px 0 2px 0;
 
-    li {
+    & > li {
       padding: 5px;
+      height: 14px;
+      overflow: hidden;
+      
+      &.edit {
+        height: auto;
+        .tags { display: none; }
+      }
       
       &.is-done {
         color: #B7B7B7;
         text-decoration: line-through;
       }
+      
+      .sc-checkbox { float: left; }
+      
+      .tags { float: right; margin-right: 20px; }
+      .tags li { display: inline; }
+      
+      .edit-tags {
+        clear: both;
+        border-radius: 4px;
+        margin: 20px 20px 5px;
+        
+        li {
+          padding: 5px;
+          font-weight: bold;
+        
+          .sc-button {
+            @include background-image(linear-gradient(#F9F9F9 1%, #DDD, #F2F2F2, #F7F7F7));
+            border: 1px solid #828282;
+            color: #000; font-size: 10px;
+            float: left;
+            margin-right: 5px; padding: 2px 3px;
+          }
+        }
+      
+        #new-tag {
+          box-shadow: none;
+          font-size: 12px;
+          margin: 5px 21px;
+          width: 150px;
+        }
+      }
     }
 
-    li:nth-child(odd) {
+    & > li:nth-child(odd) {
       background-color: #F7F7F7;
     }
   }

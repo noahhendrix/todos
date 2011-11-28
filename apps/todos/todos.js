@@ -11,7 +11,21 @@ var Todos = SC.Application.create({
 // Models
   Todos.Todo = SC.Record.extend({
     title: SC.Record.attr(String),
-    isDone: SC.Record.attr(Boolean, { defaultValue: NO })
+    isDone: SC.Record.attr(Boolean, { defaultValue: NO }),
+    tags: SC.Record.toMany('Todos.Tag', { isMaster: YES, inverse: 'todos' }),
+    
+    addTag:function(tag) {
+      this.get('tags').pushObject(tag);
+    },
+    
+    removeTag:function(tag) {
+      this.get('tags').removeObject(tag);
+    }
+  });
+  
+  Todos.Tag = SC.Record.extend({
+    title: SC.Record.attr(String),
+    todos: SC.Record.toMany('Todos.Todo', { isMaster: NO, inverse: 'tags' })
   });
 
 // Views
@@ -39,16 +53,59 @@ var Todos = SC.Application.create({
       return remaining + (remaining === 1 ? " item" : " items");
     }.property('remaining')
   });
-
-SC.ready(function() {
-  Todos.mainPane = SC.TemplatePane.append({
-    layerId: 'todos',
-    templateName: 'todos'
+  
+  Todos.FilterView = SC.TextField.extend({
+    insertNewline: function() {
+      var query = this.get('value');
+      Todos.todoListController.filterByTag(query);
+    },
+    
+    cancel: function() {
+      this.set('value', '');
+      this.insertNewline();
+    }
   });
   
-  var todos = Todos.store.find(Todos.Todo);
-  Todos.todoListController.set('content', todos);
-});
+  Todos.TodosListView = SC.TemplateCollectionView.extend({
+    itemView: SC.TemplateView.extend({
+      doubleClick: function(item) {
+        $(item.target).toggleClass('edit');
+      }
+    })
+  });
+  
+  Todos.AddTagView = SC.TextField.extend({
+    todoBinding: '.parentView.content',
+    
+    findOrCreateTag: function(title) {
+      var q = SC.Query.create({
+        conditions: "title = %@",
+        parameters: [title],
+        recordType: Todos.Tag
+      });
+      
+      var tag = Todos.store.find(q).firstObject();
+      if(tag)
+        return tag;
+      else {
+        return Todos.store.createRecord(Todos.Tag, {
+          title: title
+        }, Math.random(Math.floor(Math.random() * 99999999)));
+      }
+    },
+    
+    insertNewline: function() {
+      var todo = this.get('todo');
+      var tag_name = this.get('value');
+      var tag = this.findOrCreateTag(tag_name);
+      todo.addTag(tag);
+      this.set('value', '');
+    },
+    
+    cancel: function() {
+      this.set('value', '');
+    }
+  });
 
 // Controllers
   Todos.todoListController = SC.ArrayController.create({
@@ -64,7 +121,7 @@ SC.ready(function() {
       return Todos.store.createRecord(Todos.Todo, {
         title: title,
         isDone: isDone
-      });
+      }, Math.random(Math.floor(Math.random() * 99999999)));
     },
     
     remaining: function() {
@@ -84,6 +141,44 @@ SC.ready(function() {
       } else {
         return this.get('length') && this.everyProperty('isDone', true);
       }
-    }.property('@each.isDone')
+    }.property('@each.isDone'),
+    
+    filterByTag: function(tag_query) {
+      if(tag_query == '' || tag_query == undefined) {
+        var todos = Todos.store.find(Todos.Todo);
+        this.set('content', todos);
+        return;
+      }
+      
+      var q = SC.Query.create({
+        conditions: "title = %@",
+        parameters: [tag_query],
+        recordType: Todos.Tag
+      });
+      
+      var todos = [];
+      
+      var tags = Todos.store.find(q);
+      if(tags)
+        todos = tags.mapProperty('todos').flatten();
+      
+      this.set('content', todos);
+    },
+    
+    removeTag: function(button) {
+      var todo = button.parentView.parentView.parentView.content;
+      var tag = button.parentView.content;
+      todo.removeTag(tag);
+    }
     
   });
+
+SC.ready(function() {
+  Todos.mainPane = SC.TemplatePane.append({
+    layerId: 'todos',
+    templateName: 'todos'
+  });
+
+  var todos = Todos.store.find(Todos.Todo);
+  Todos.todoListController.set('content', todos);
+});
